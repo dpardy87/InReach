@@ -34,3 +34,6 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
+## Google Auth
+
+Visit [http://localhost:3000/auth/google](http://localhost:3000/auth/google) to init Google Auth
