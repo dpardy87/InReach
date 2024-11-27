@@ -11,13 +11,13 @@ import { ConfigModule } from '@nestjs/config';
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
+      host: 'mysql', // based on docker-compose.yml
       port: 3306,
       username: 'root',
       password: 'root_password',
       database: 'InReach',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true, // For development only, set to false in production
+      synchronize: true, // set to false in prod
     }),
     CheckInModule,
     AuthModule,
