@@ -13,8 +13,8 @@ import { ConfigModule } from '@nestjs/config';
       type: 'mysql',
       host: 'mysql', // based on docker-compose.yml
       port: 3306,
-      username: 'root',
-      password: 'root_password',
+      username: 'user',
+      password: 'password',
       database: 'InReach',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true, // set to false in prod

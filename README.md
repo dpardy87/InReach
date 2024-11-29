@@ -5,45 +5,18 @@
 ## Project setup
 
 ```bash
-$ npm install
-```
-
-## Use docker-compose to spin up services
-
-```bash
-# remove all named volumes
-$ docker-compose down -v
-
-# run in detached mode
-$ docker-compose up -d
-```
-
-## Compile and run the project
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Run tests
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+$ docker-compose up --build
 ```
 
 ## Google Auth
 
 Visit [http://localhost:3000/auth/google](http://localhost:3000/auth/google) to init Google Auth
+
+Then use the `accessToken` key and pass it into the `/checkin` endpoint as a `POST` request:
+
+```bash
+ 
+ curl -X POST http://localhost:3000/checkin \
+ 	-H "Authorization: Bearer ACCESS_TOKEN" \
+ 	-H "Content-Type: application/json" \
+ 	-d '{"latitude": 40.7128, "longitude": -74.0060}'
