@@ -8,6 +8,16 @@
 $ npm install
 ```
 
+## Use docker-compose to spin up services
+
+```bash
+# remove all named volumes
+$ docker-compose down -v
+
+# run in detached mode
+$ docker-compose up -d
+```
+
 ## Compile and run the project
 
 ```bash
