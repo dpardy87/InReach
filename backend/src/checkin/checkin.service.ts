@@ -1,33 +1,37 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { CheckIn } from './checkin.entity';
+import { MySQLService } from '../mysql/mysql.service';
 
 @Injectable()
 export class CheckInService {
-  constructor(
-    @InjectRepository(CheckIn) private checkInRepository: Repository<CheckIn>,
-  ) {}
+  constructor(private readonly mysqlService: MySQLService) {}
 
-  // create a new check-in entry
-  async createCheckIn(
-    userId: string,
-    latitude: number,
-    longitude: number,
-  ): Promise<CheckIn> {
-    const newCheckIn = this.checkInRepository.create({
+  // create new check-in
+  async createCheckIn(userId: string, latitude: number, longitude: number): Promise<any> {
+    const checkInTime = new Date();
+
+    const sql = `INSERT INTO checkins (user_id, latitude, longitude, check_in_time) VALUES (?, ?, ?, ?)`;
+
+    const result = await this.mysqlService.query(sql, [userId, latitude, longitude, checkInTime]);
+    return {
+      message: 'Check-in added successfully',
+      id: result[0]?.insertId,
       userId,
       latitude,
       longitude,
-    });
-    return this.checkInRepository.save(newCheckIn);
+      checkInTime,
+    };
   }
 
-  // get all check-ins for user
-  async getUserCheckIns(userId: string): Promise<CheckIn[]> {
-    return this.checkInRepository.find({
-      where: { userId },
-      order: { checkInTime: 'DESC' },
-    });
+  // get all check-ins for a user
+  async getUserCheckIns(userId: string): Promise<any[]> {
+    const sql = `
+      SELECT id, user_id AS userId, latitude, longitude, check_in_time AS checkInTime
+      FROM checkins
+      WHERE user_id = ?
+      ORDER BY check_in_time DESC
+    `;
+
+    const [rows] = await this.mysqlService.query(sql, [userId]);
+    return rows;
   }
 }

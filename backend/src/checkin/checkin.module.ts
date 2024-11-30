@@ -1,12 +1,10 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { MySQLService } from '../mysql/mysql.service';
 import { CheckInService } from './checkin.service';
 import { CheckInController } from './checkin.controller';
-import { CheckIn } from './checkin.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([CheckIn])],
   controllers: [CheckInController],
-  providers: [CheckInService],
+  providers: [CheckInService, MySQLService],
 })
 export class CheckInModule {}

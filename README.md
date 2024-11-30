@@ -15,8 +15,8 @@ Visit [http://localhost:3000/auth/google](http://localhost:3000/auth/google) to 
 Then use the `accessToken` key and pass it into the `/checkin` endpoint as a `POST` request:
 
 ```bash
- 
  curl -X POST http://localhost:3000/checkin \
  	-H "Authorization: Bearer ACCESS_TOKEN" \
  	-H "Content-Type: application/json" \
- 	-d '{"latitude": 40.7128, "longitude": -74.0060}'
+	-d '{"latitude": 40.7128, "longitude": -74.0060}'
+```

@@ -6,20 +6,18 @@ import { AuthGuard } from '@nestjs/passport';
 export class CheckInController {
   constructor(private readonly checkInService: CheckInService) {}
 
-  // Endpoint for users to check in
+  // allows user to check in
   @Post()
-  @UseGuards(AuthGuard('jwt')) // Protect this route with JWT authentication
+  @UseGuards(AuthGuard('jwt'))
   async createCheckIn(@Req() req, @Body() checkInDto: { latitude: number; longitude: number }) {
-
     const userId = req.user.userId; // Get user ID from JWT
-    console.log("createCheckIn, userId: ", userId);
     const { latitude, longitude } = checkInDto;
     return this.checkInService.createCheckIn(userId, latitude, longitude);
   }
 
-  // Endpoint to get the user's check-in history
+  // get the user's check-in history
   @Get('history')
-  @UseGuards(AuthGuard('jwt')) // Protect this route with JWT authentication
+  @UseGuards(AuthGuard('jwt'))
   async getCheckIns(@Req() req) {
     const userId = req.user.userId;
     return this.checkInService.getUserCheckIns(userId);
