@@ -8,6 +8,10 @@
 $ docker-compose up --build
 ```
 
+## Interact with Frontend
+
+Visit [http://localhost:8080/checkin](http://localhost:8080/checkin)
+
 ## Google Auth
 
 Visit [http://localhost:3000/auth/google](http://localhost:3000/auth/google) to init Google Auth

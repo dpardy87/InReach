@@ -1,74 +1,94 @@
 <template>
-  <div>
-    <button @click="checkIn">Check In</button>
-
-    <!-- Feedback for success or error -->
-    <p v-if="successMessage">{{ successMessage }}</p>
-    <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
+  <div class="auth-container">
+    <button @click="redirectToGoogle" class="auth-button">
+      Login with Google
+    </button>
+    <div v-if="accessToken" class="token-display">
+      <p><strong>Access Token:</strong></p>
+      <textarea readonly v-model="accessToken"></textarea>
+    </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
+import axios from "axios";
 
 export default {
   data() {
     return {
-      successMessage: '',
-      errorMessage: '',
-    }
+      accessToken: null,
+    };
   },
   methods: {
-    async checkIn() {
-      // Check if the browser supports Geolocation
-      if (navigator.geolocation) {
-        // Request the user's current position
-        navigator.geolocation.getCurrentPosition(
-          async (position) => {
-            const { latitude, longitude } = position.coords
-            const token = localStorage.getItem('jwtToken')
-
-            try {
-              const response = await axios.post(
-                '/checkin', // API endpoint
-                { latitude, longitude }, // Send latitude and longitude as request body
-                {
-                  headers: {
-                    Authorization: `Bearer ${token}`, // Pass JWT for authorization
-                    'Content-Type': 'application/json',
-                  },
-                }
-              )
-
-              // Set success message
-              this.successMessage = 'Check-in successful!'
-              this.errorMessage = '' // Clear any error messages
-            } catch (error) {
-              // Handle errors (e.g., network error, 401 Unauthorized, etc.)
-              this.successMessage = ''
-              if (error.response && error.response.status === 401) {
-                this.errorMessage = 'Unauthorized. Please log in.'
-              } else {
-                this.errorMessage = 'Check-in failed. Please try again.'
-              }
-            }
-          },
-          (error) => {
-            // Handle error with geolocation
-            this.errorMessage =
-              'Unable to retrieve your location. Please enable location services.'
+    redirectToGoogle() {
+      // redirect to google login
+      window.location.href = "http://localhost:3000/auth/google";
+    },
+    async fetchAccessToken() {
+      try {
+        // get user info after redirect
+        const response = await axios.get(
+          "http://localhost:3000/auth/google/callback",
+          {
+            // options
           }
-        )
-      } else {
-        this.errorMessage = 'Geolocation is not supported by this browser.'
+        );
+
+        if (
+          response.data &&
+          response.data.user &&
+          response.data.user.accessToken
+        ) {
+          this.accessToken = response.data.user.accessToken;
+          console.log("Access token fetched successfully:", this.accessToken);
+        } else {
+          console.warn("Access token not found in the response.");
+        }
+      } catch (error) {
+        console.error("Error fetching access token:", error);
       }
     },
   },
-}
+  mounted() {
+    this.fetchAccessToken();
+  },
+};
 </script>
 
-<style scoped>
-.error {
-  color: red;
+<style>
+.auth-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 50px;
+}
+
+.auth-button {
+  background-color: #4285f4;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.auth-button:hover {
+  background-color: #357ae8;
+}
+
+.token-display {
+  margin-top: 20px;
+  text-align: center;
+}
+
+textarea {
+  width: 300px;
+  height: 100px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  font-family: inherit;
+  font-size: 14px;
 }
 </style>

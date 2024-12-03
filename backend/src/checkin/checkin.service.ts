@@ -7,19 +7,21 @@ export class CheckInService {
 
   // create new check-in
   async createCheckIn(userId: string, latitude: number, longitude: number): Promise<any> {
-    const checkInTime = new Date();
-
-    const sql = `INSERT INTO checkins (user_id, latitude, longitude, check_in_time) VALUES (?, ?, ?, ?)`;
-
-    const result = await this.mysqlService.query(sql, [userId, latitude, longitude, checkInTime]);
-    return {
-      message: 'Check-in added successfully',
-      id: result[0]?.insertId,
-      userId,
-      latitude,
-      longitude,
-      checkInTime,
-    };
+    try {
+      const checkInTime = new Date();
+      const sql = `INSERT INTO checkins (user_id, latitude, longitude, check_in_time) VALUES (?, ?, ?, ?)`;
+      const result = await this.mysqlService.query(sql, [userId, latitude, longitude, checkInTime]);
+      return {
+        message: 'Check-in added successfully',
+        id: result[0]?.insertId,
+        userId,
+        latitude,
+        longitude,
+        checkInTime,
+      };
+    } catch (error) {
+      throw new Error(`Error creating new check-in: ${error.message}`)
+    }
   }
 
   // get all check-ins for a user
