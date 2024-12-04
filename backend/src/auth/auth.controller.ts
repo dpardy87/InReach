@@ -1,52 +1,53 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { AuthService } from './auth.service';
 import { JwtService } from '@nestjs/jwt';
+import { Request, Response } from 'express';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly jwtService: JwtService
-  ) {}
+  constructor(private readonly jwtService: JwtService) {}
 
+  // route to initiate Google login
   @Get('google')
-  @UseGuards(AuthGuard('google'))
-  async googleAuth(@Req() req) {
-    // init Google OAuth
+  @UseGuards(AuthGuard('google')) // triggers Google login
+  async googleAuth() {
+    // guard will handle the redirect
   }
 
+  @Get('validate')
+  @UseGuards(JwtAuthGuard)
+  validateUser(@Req() req: any) {
+    return { authenticated: true, user: req.user };
+  }
+
+  // route to handle the Google login callback
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
-  googleAuthRedirect(@Req() req) {
-    //return this.authService.googleLogin(req);
-    // After successful Google login, we generate a JWT
+  async googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
     if (!req.user) {
-      return 'No user from Google';
+      return res.redirect('/login?error=No user from Google');
     }
 
-    const user = req.user;
-
-    // Generate JWT using AuthService or JwtService
+    const user = req.user as any;
     const payload = { email: user.email, sub: user.userId };
-    const accessToken = this.jwtService.sign(payload); // Generate JWT
 
-    // Send back the JWT and user info
-    return {
-      message: 'User information from Google',
-      user: {
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        picture: user.picture,
-        accessToken, // Include the generated JWT here
-      },
-    };
-  }
+    try {
+      const accessToken = this.jwtService.sign(payload);
 
-  @Get('profile')
-  @UseGuards(AuthGuard('jwt'))
-  getProfile(@Req() req) {
-    return req.user;
+      // set  token in an HttpOnly cookie
+      res.cookie('accessToken', accessToken, {
+        httpOnly: true, // Prevent JavaScript access
+        secure: true, // Use HTTPS in production
+        sameSite: 'strict', // Prevent cross-site requests
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
+      });
+
+      // redirect to the frontend
+      return res.redirect(`http://localhost:8080/checkin`);
+    } catch (error) {
+      console.error('Error generating JWT:', error);
+      return res.redirect('/login?error=TokenGenerationFailed');
+    }
   }
 }

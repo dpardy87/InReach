@@ -6,14 +6,12 @@ export class AuthService {
   constructor(private jwtService: JwtService) {}
 
   async login(user: any) {
-    console.log("logging in...");
     const payload = { email: user.email, sub: user.userId };
-    console.log("login payload: ", payload);
     return {
       access_token: this.jwtService.sign(payload),
     };
   }
-  
+
   async googleLogin(req: any) {
     if (!req.user) {
       return 'No user from Google';
@@ -21,8 +19,8 @@ export class AuthService {
 
     const user = req.user;
 
-    // Generate the JWT, ensuring `userId` is part of the payload
-    const payload = { email: user.email, sub: user.userId }; // `sub` for userId
+    // generate JWT
+    const payload = { email: user.email, sub: user.userId };
     const accessToken = this.jwtService.sign(payload);
 
     return {

@@ -9,7 +9,10 @@ export class CheckInController {
   // allows user to check in
   @Post()
   @UseGuards(AuthGuard('jwt'))
-  async createCheckIn(@Req() req, @Body() checkInDto: { latitude: number; longitude: number }) {
+  async createCheckIn(
+    @Req() req,
+    @Body() checkInDto: { latitude: number; longitude: number },
+  ) {
     const userId = req.user.userId; // Get user ID from JWT
     const { latitude, longitude } = checkInDto;
     return this.checkInService.createCheckIn(userId, latitude, longitude);
