@@ -21,32 +21,26 @@
 </template>
 
 <script>
-import { ref, onMounted } from "vue";
-import { fetchGoogleMapsApiKey } from "@/utils/fetchGoogleMapsApiKey";
+import { ref } from "vue";
+import { getDistanceFromGoogle } from "@/utils/googleMaps";
 import axios from "axios";
 
 export default {
   setup() {
     const locationName = ref("");
     const address = ref("");
+    const distance = ref(null);
     const notes = ref("");
     const message = ref("");
-    const googleMapsApiKey = ref(null);
 
     // validate/geocode address
     const validateAddress = async (address) => {
-      if (!googleMapsApiKey.value) {
-        alert("Google Maps API key is not available.");
-        return { valid: false };
-      }
-
-      const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
-        address
-      )}&key=${googleMapsApiKey.value}`;
-
       try {
-        const response = await axios.get(url);
-        if (response.data.status === "OK") {
+        const response = await axios.get("http://localhost:3000/maps/geocode", {
+          params: { address },
+        });
+
+        if (response.data.status === "OK" && response.data.results.length > 0) {
           const location = response.data.results[0].geometry.location;
           return {
             valid: true,
@@ -54,7 +48,10 @@ export default {
             longitude: location.lng,
           };
         } else {
-          console.warn("Invalid address:", response.data.status);
+          console.warn(
+            "Invalid address or no valid results found:",
+            response.data
+          );
           return { valid: false };
         }
       } catch (error) {
@@ -63,10 +60,48 @@ export default {
       }
     };
 
-    // form submission
+    // pass in addressValidation arg to avoid calling validateAddress() twice
+    const calculateDistance = async (addressValidation) => {
+      if (!navigator.geolocation) {
+        console.error("Geolocation is not supported by this browser.");
+        return null;
+      }
+
+      return new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const userLocation = `${position.coords.latitude},${position.coords.longitude}`;
+
+            // Use the already validated address
+            if (!addressValidation.valid) {
+              console.warn("Invalid address for distance calculation.");
+              return resolve(null);
+            }
+
+            const destination = `${addressValidation.latitude},${addressValidation.longitude}`;
+            try {
+              const distance = await getDistanceFromGoogle(
+                userLocation,
+                destination
+              );
+              // return the calculated distance
+              resolve(distance);
+            } catch (error) {
+              console.error("Error calculating distance:", error);
+              reject(error);
+            }
+          },
+          (error) => {
+            console.error("Error getting user location:", error);
+            reject(error);
+          }
+        );
+      });
+    };
+
     const submitCheckIn = async () => {
       try {
-        // validate address before submitting
+        // Validate address first and store the result
         const addressValidation = await validateAddress(address.value);
 
         if (!addressValidation.valid) {
@@ -74,12 +109,16 @@ export default {
           return;
         }
 
+        // Pass the validated address to calculateDistance
+        const calculatedDistance = await calculateDistance(addressValidation);
+
         const payload = {
           locationName: locationName.value || null,
           address: address.value || null,
           latitude: addressValidation.latitude,
           longitude: addressValidation.longitude,
           notes: notes.value || null,
+          distance: calculatedDistance,
         };
 
         const response = await axios.post(
@@ -98,15 +137,13 @@ export default {
       }
     };
 
-    onMounted(async () => {
-      googleMapsApiKey.value = await fetchGoogleMapsApiKey();
-    });
-
     return {
       locationName,
       address,
       notes,
       message,
+      distance,
+      calculateDistance,
       submitCheckIn,
     };
   },
