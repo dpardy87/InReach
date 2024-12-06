@@ -13,4 +13,14 @@ describe('AppController', () => {
 
     appController = app.get<AppController>(AppController);
   });
+
+  describe('getHealth', () => {
+    it('should return health status', () => {
+      const result = appController.getHealth();
+      expect(result).toEqual({
+        status: 'ok',
+        timestamp: expect.any(String),
+      });
+    });
+  });
 });

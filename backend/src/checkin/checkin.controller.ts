@@ -44,6 +44,7 @@ export class CheckInController {
   @Get('history')
   @UseGuards(AuthGuard('jwt'))
   async getCheckIns(@Req() req) {
+    // get userId from authenticated user data
     const userId = req.user.userId;
     return this.checkInService.getUserCheckIns(userId);
   }

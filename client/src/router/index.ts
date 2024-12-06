@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import CheckIn from "@/components/CheckIn.vue";
 import CheckInForm from "@/components/CheckInForm.vue";
+import CheckInHistory from "@/components/CheckInHistory.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -16,6 +17,11 @@ const routes: Array<RouteRecordRaw> = [
     path: "/checkin",
     name: "CheckInForm",
     component: CheckInForm,
+  },
+  {
+    path: "/checkin/history",
+    name: "CheckInHistory",
+    component: CheckInHistory,
   },
 ];
 

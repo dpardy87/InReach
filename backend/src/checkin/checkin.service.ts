@@ -53,7 +53,6 @@ export class CheckInService {
         INSERT INTO checkins (userId, locationId, notes, checkInTime, distance)
         VALUES (?, ?, ?, ?, ?)
       `;
-      console.log('checkInSql vars:', userId, locationId, notes, checkInTime, distance);
       const checkInResult = await this.mysqlService.query(checkInSql, [
         userId,
         locationId,
@@ -81,22 +80,26 @@ export class CheckInService {
   /**
    * Get all check-ins for a user
    */
-  async getUserCheckIns(userId: string): Promise<any[]> {
+  async getUserCheckIns(userId: number): Promise<any[]> {
     const sql = `
-      SELECT
-        c.id AS checkInId,
-        c.notes,
-        c.checkInTime,
-        l.locationName,
-        l.address,
-        l.latitude,
-        l.longitude
-      FROM checkins c
-      JOIN locations l ON c.locationId = l.id
-      WHERE c.userId = ?
-      ORDER BY c.checkInTime DESC
-    `;
-
+    SELECT
+      c.id AS checkInId,
+      c.notes,
+      c.checkInTime,
+      c.distance,
+      l.locationName,
+      l.address,
+      l.latitude,
+      l.longitude,
+      l.createdAt AS locationCreatedAt,
+      u.email AS userEmail,
+      u.firstName AS userFirstName
+    FROM checkins c
+    LEFT JOIN locations l ON c.locationId = l.id
+    LEFT JOIN users u ON c.userId = u.id
+    WHERE c.userId = ?
+    ORDER BY c.checkInTime DESC;
+  `;
     const [rows] = await this.mysqlService.query(sql, [userId]);
     return rows;
   }
