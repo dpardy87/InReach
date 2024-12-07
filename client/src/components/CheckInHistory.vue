@@ -1,36 +1,43 @@
 <template>
   <div>
     <h2>Check-In History</h2>
-    <ul v-if="checkIns.length">
-      <li v-for="checkIn in checkIns" :key="checkIn.checkInId">
-        <h3>{{ checkIn.locationName }}</h3>
-        <p><strong>Address:</strong> {{ checkIn.address }}</p>
-        <p>
-          <strong>Check-In Time:</strong>
-          {{ new Date(checkIn.checkInTime).toLocaleString() }}
-        </p>
-        <p><strong>Notes:</strong> {{ checkIn.notes }}</p>
-        <p><strong>Distance:</strong> {{ checkIn.distance }} miles</p>
-        <p>
-          <strong>User:</strong> {{ checkIn.userFirstName }} ({{
-            checkIn.userEmail
-          }})
-        </p>
-        <p>
-          <strong>Location Created At:</strong>
-          {{ new Date(checkIn.locationCreatedAt).toLocaleString() }}
-        </p>
-      </li>
-    </ul>
-    <p v-else>No check-ins found.</p>
+    <DataTable
+      :value="checkIns"
+      class="p-datatable-gridlines"
+      :scrollable="true"
+      scrollHeight="400px"
+    >
+      <Column field="locationName" header="Location Name" />
+      <Column field="address" header="Address" />
+      <Column field="checkInTime" header="Check-In Time" :body="formatDate" />
+      <Column field="notes" header="Notes" />
+      <Column field="distance" header="Distance (miles)" />
+      <Column field="userFirstName" header="User">
+        <template #body="slotProps">
+          {{ slotProps.data.userFirstName }} ({{ slotProps.data.userEmail }})
+        </template>
+      </Column>
+      <Column
+        field="locationCreatedAt"
+        header="Location Created At"
+        :body="formatDate"
+      />
+    </DataTable>
+    <p v-if="!checkIns.length" class="p-mt-4">No check-ins found.</p>
   </div>
 </template>
 
 <script>
 import axios from "axios";
 import { ref, onMounted } from "vue";
+import DataTable from "primevue/datatable";
+import Column from "primevue/column";
 
 export default {
+  components: {
+    DataTable,
+    Column,
+  },
   setup() {
     const checkIns = ref([]);
 
