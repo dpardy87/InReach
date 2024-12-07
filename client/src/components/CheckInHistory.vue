@@ -14,14 +14,9 @@
       <Column field="distance" header="Distance (miles)" />
       <Column field="userFirstName" header="User">
         <template #body="slotProps">
-          {{ slotProps.data.userFirstName }} ({{ slotProps.data.userEmail }})
+          {{ slotProps.data.userEmail }}
         </template>
       </Column>
-      <Column
-        field="locationCreatedAt"
-        header="Location Created At"
-        :body="formatDate"
-      />
     </DataTable>
     <p v-if="!checkIns.length" class="p-mt-4">No check-ins found.</p>
   </div>

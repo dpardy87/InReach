@@ -1,25 +1,28 @@
 <template>
-  <div class="auth-container">
+  <div class="p-d-flex p-flex-column p-ai-center auth-container">
     <h1>Welcome to the Check-In App</h1>
-    <button
+    <!-- Login Button -->
+    <Button
       v-if="!isAuthenticated"
+      label="Login with Google"
+      icon="pi pi-google"
+      class="p-button-rounded p-button-primary auth-button"
       @click="redirectToGoogle"
-      class="auth-button"
-    >
-      Login with Google
-    </button>
+    />
+    <!-- Check-In Form -->
     <CheckInForm v-else />
   </div>
 </template>
-
 <script>
 import { ref, onMounted } from "vue";
 import axios from "axios";
 import CheckInForm from "@/components/CheckInForm.vue";
+import Button from "primevue/button";
 
 export default {
   components: {
     CheckInForm,
+    Button,
   },
   setup() {
     const isAuthenticated = ref(false);
@@ -60,23 +63,4 @@ export default {
 };
 </script>
 
-<style>
-.auth-container {
-  text-align: center;
-  margin-top: 50px;
-}
-
-.auth-button {
-  background-color: #4285f4;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-.auth-button:hover {
-  background-color: #357ae8;
-}
-</style>
+<style></style>

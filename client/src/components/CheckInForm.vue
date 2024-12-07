@@ -35,9 +35,11 @@
     <!-- Submit Button -->
     <div class="p-col-12 button-container">
       <Button
-        label="Submit Check-In"
+        :label="isLoading ? 'Submitting...' : 'Submit Check-In'"
         icon="pi pi-check"
+        :iconPos="isLoading ? 'right' : 'left'"
         class="p-button-rounded p-button-success"
+        :loading="isLoading"
         @click="submitCheckIn"
       />
     </div>
@@ -66,6 +68,7 @@ export default {
     const distance = ref(null);
     const notes = ref("");
     const message = ref("");
+    const isLoading = ref(false);
 
     // validate/geocode address
     const validateAddress = async (address) => {
@@ -135,6 +138,7 @@ export default {
 
     const submitCheckIn = async () => {
       try {
+        isLoading.value = true;
         // Validate address first and store the result
         const addressValidation = await validateAddress(address.value);
 
@@ -169,6 +173,8 @@ export default {
       } catch (error) {
         console.error("Error during check-in:", error);
         message.value = "Check-in failed. Please try again.";
+      } finally {
+        isLoading.value = false;
       }
     };
 
@@ -178,6 +184,7 @@ export default {
       notes,
       message,
       distance,
+      isLoading,
       calculateDistance,
       submitCheckIn,
     };
