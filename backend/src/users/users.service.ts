@@ -11,7 +11,6 @@ export class UserService {
    */
   async findByGoogleId(googleId: string): Promise<any> {
     const sql = `SELECT * FROM users WHERE googleId = ? LIMIT 1`;
-    console.log('sql for findByGoogleId: ', sql);
     const [rows] = await this.mysqlService.query(sql, [googleId]);
     return rows[0]; // Return the first result or undefined if not found
   }

@@ -22,11 +22,13 @@
 
 <script>
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 import { getDistanceFromGoogle } from "@/utils/googleMaps";
 import axios from "axios";
 
 export default {
   setup() {
+    const router = useRouter();
     const locationName = ref("");
     const address = ref("");
     const distance = ref(null);
@@ -131,6 +133,7 @@ export default {
 
         console.log("Check-in successful:", response.data);
         message.value = "Check-in successful!";
+        router.push("/checkin/history");
       } catch (error) {
         console.error("Error during check-in:", error);
         message.value = "Check-in failed. Please try again.";
