@@ -1,22 +1,46 @@
 <template>
-  <div class="checkin-form">
-    <h1>Check In</h1>
-    <form @submit.prevent="submitCheckIn">
-      <div>
-        <label for="locationName">Location Name:</label>
-        <input type="text" id="locationName" v-model="locationName" required />
-      </div>
-      <div>
-        <label for="address">Address:</label>
-        <input type="text" id="address" v-model="address" required />
-      </div>
-      <div>
-        <label for="notes">Notes:</label>
-        <textarea id="notes" v-model="notes"></textarea>
-      </div>
-      <button type="submit" class="checkin-button">Check In</button>
-    </form>
-    <p v-if="message">{{ message }}</p>
+  <div class="p-fluid p-grid form-container">
+    <h2 class="p-col-12">Check In</h2>
+    <!-- Location Name Input -->
+    <div class="p-field p-col-12 p-md-6">
+      <label for="locationName" class="form-label">Location Name</label>
+      <InputText
+        id="locationName"
+        v-model="locationName"
+        class="form-input"
+        placeholder="Enter location name"
+      />
+    </div>
+    <!-- Address Input -->
+    <div class="p-field p-col-12 p-md-6">
+      <label for="address" class="form-label">Address</label>
+      <InputText
+        id="address"
+        v-model="address"
+        class="form-input"
+        placeholder="Enter address"
+      />
+    </div>
+    <!-- Notes Input -->
+    <div class="p-field p-col-12">
+      <label for="notes" class="form-label">Notes</label>
+      <Textarea
+        id="notes"
+        v-model="notes"
+        class="form-input"
+        rows="4"
+        placeholder="Add notes (optional)"
+      />
+    </div>
+    <!-- Submit Button -->
+    <div class="p-col-12 button-container">
+      <Button
+        label="Submit Check-In"
+        icon="pi pi-check"
+        class="p-button-rounded p-button-success"
+        @click="submitCheckIn"
+      />
+    </div>
   </div>
 </template>
 
@@ -24,9 +48,17 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { getDistanceFromGoogle } from "@/utils/googleMaps";
+import InputText from "primevue/inputtext";
+import Textarea from "primevue/textarea";
+import Button from "primevue/button";
 import axios from "axios";
 
 export default {
+  components: {
+    InputText,
+    Textarea,
+    Button,
+  },
   setup() {
     const router = useRouter();
     const locationName = ref("");
@@ -154,54 +186,31 @@ export default {
 </script>
 
 <style scoped>
-.checkin-form {
-  max-width: 400px;
+.form-container {
+  max-width: 800px;
   margin: 0 auto;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
 }
 
-.checkin-form h1 {
+h2 {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 2rem;
 }
 
-.checkin-form label {
-  display: block;
-  margin-bottom: 5px;
+.p-field {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
   font-weight: bold;
-}
-
-.checkin-form input,
-.checkin-form textarea {
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 15px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.checkin-form button {
+  margin-bottom: 0.5rem;
   display: block;
+}
+
+.form-input {
   width: 100%;
-  background-color: #4285f4;
-  color: white;
-  padding: 10px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
 }
 
-.checkin-form button:hover {
-  background-color: #357ae8;
-}
-
-.checkin-form p {
+.button-container {
   text-align: center;
-  margin-top: 15px;
-  font-size: 14px;
-  color: green;
 }
 </style>
