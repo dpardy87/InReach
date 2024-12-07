@@ -91,7 +91,6 @@ export class CheckInService {
       l.address,
       l.latitude,
       l.longitude,
-      l.createdAt AS locationCreatedAt,
       u.email AS userEmail,
       u.firstName AS userFirstName
     FROM checkins c
