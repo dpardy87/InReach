@@ -27,3 +27,21 @@ export const getDistanceFromGoogle = async (origin, destination) => {
     return null;
   }
 };
+
+export const getAutocompleteSuggestions = async (input) => {
+  try {
+    const response = await axios.get(
+      "http://localhost:3000/maps/autocomplete",
+      {
+        params: { input },
+        withCredentials: true, // Ensure cookies are sent for authentication
+      }
+    );
+
+    const predictions = response.data.predictions;
+    return predictions || [];
+  } catch (error) {
+    console.error("Error fetching autocomplete suggestions:", error);
+    return [];
+  }
+};

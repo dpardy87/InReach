@@ -41,4 +41,22 @@ export class MapsController {
         .send(error.response?.data || 'Internal Server Error');
     }
   }
+
+  @Get('autocomplete')
+  async getAutocomplete(@Query('input') input: string, @Res() res: Response) {
+    const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+    const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(
+      input,
+    )}&key=${apiKey}`;
+
+    try {
+      const response = await axios.get(url);
+      res.status(response.status).send(response.data);
+    } catch (error) {
+      console.error('Error fetching autocomplete data:', error);
+      res
+        .status(error.response?.status || 500)
+        .send(error.response?.data || 'Internal Server Error');
+    }
+  }
 }

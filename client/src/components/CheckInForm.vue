@@ -14,12 +14,25 @@
     <!-- Address Input -->
     <div class="p-field p-col-12 p-md-6">
       <label for="address" class="form-label">Address</label>
-      <InputText
-        id="address"
-        v-model="address"
-        class="form-input"
-        placeholder="Enter address"
-      />
+      <div class="autocomplete-wrapper">
+        <InputText
+          id="address"
+          v-model="address"
+          class="form-input"
+          placeholder="Enter address"
+          @input="fetchSuggestions"
+        />
+        <ul v-if="suggestions.length" class="autocomplete-suggestions">
+          <li
+            v-for="suggestion in suggestions"
+            :key="suggestion.place_id"
+            @click="selectSuggestion(suggestion.description)"
+            class="autocomplete-item"
+          >
+            {{ suggestion.description }}
+          </li>
+        </ul>
+      </div>
     </div>
     <!-- Notes Input -->
     <div class="p-field p-col-12">
@@ -49,7 +62,10 @@
 <script>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { getDistanceFromGoogle } from "@/utils/googleMaps";
+import {
+  getDistanceFromGoogle,
+  getAutocompleteSuggestions,
+} from "@/utils/googleMaps";
 import InputText from "primevue/inputtext";
 import Textarea from "primevue/textarea";
 import Button from "primevue/button";
@@ -68,7 +84,21 @@ export default {
     const distance = ref(null);
     const notes = ref("");
     const message = ref("");
+    const suggestions = ref([]);
     const isLoading = ref(false);
+
+    const fetchSuggestions = async () => {
+      if (address.value.length > 2) {
+        suggestions.value = await getAutocompleteSuggestions(address.value);
+      } else {
+        suggestions.value = [];
+      }
+    };
+
+    const selectSuggestion = (description) => {
+      address.value = description;
+      suggestions.value = []; // Clear suggestions after selection
+    };
 
     // validate/geocode address
     const validateAddress = async (address) => {
@@ -185,6 +215,9 @@ export default {
       message,
       distance,
       isLoading,
+      suggestions,
+      fetchSuggestions,
+      selectSuggestion,
       calculateDistance,
       submitCheckIn,
     };
@@ -219,5 +252,45 @@ h2 {
 
 .button-container {
   text-align: center;
+}
+
+.autocomplete-wrapper {
+  position: relative;
+}
+
+.autocomplete-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: black;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-2);
+  z-index: 10;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  border-radius: var(--border-radius);
+}
+
+.autocomplete-item {
+  padding: 0.5rem 1rem;
+  text-align: left;
+  cursor: pointer;
+  color: var(--text-color);
+  background: var(--surface-a);
+  transition: background 0.3s;
+}
+
+.autocomplete-item:hover {
+  background: var(--primary-color-light);
+  color: var(--primary-color-text);
+}
+
+.autocomplete-item:active {
+  background: var(--primary-color);
+  color: var(--primary-color-text);
 }
 </style>
