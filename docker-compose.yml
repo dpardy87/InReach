@@ -31,7 +31,7 @@ services:
   mysql:
     image: mysql:8.0
     container_name: inreach-mysql
-    restart: unless-stopped
+    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root_password
       MYSQL_DATABASE: InReach
@@ -40,6 +40,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
+      - ./queries.sql:/docker-entrypoint-initdb.d/queries.sql
       - mysql_data:/var/lib/mysql
     networks:
       - app-network
