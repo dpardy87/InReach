@@ -44,7 +44,6 @@ export class UserService {
       lastName,
       picture,
     ]);
-    console.log('createUser result variable in users.serice.ts:\n', result);
 
     return {
       id: result[0].insertId, // Inserted user's ID

@@ -1,6 +1,8 @@
 ## InReach
 
-[NestJS](https://github.com/nestjs/nest) app for location check-ins. 
+![InReach Logo](./docs/in_reach.png)
+
+[NestJS](https://github.com/nestjs/nest) app for location check-ins. This README provides instructions for setting up the application.
 
 ## Project setup
 
