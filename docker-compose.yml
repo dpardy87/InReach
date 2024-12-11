@@ -11,6 +11,11 @@ services:
       - mysql
     networks:
       - app-network
+    # backend service waits until MySQL port is open
+    entrypoint: >
+      sh -c "while ! nc -z mysql 3306; do
+      echo 'Waiting for MySQL...'; sleep 3; done;
+      npm start"
 
   client:
     build:
@@ -42,6 +47,11 @@ services:
     volumes:
       - ./db/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - app-network
 
