@@ -1,21 +1,19 @@
 import { Controller, Get, Query, Res } from '@nestjs/common';
-import axios from 'axios';
+import { DistanceQueryDto } from '../common/dto/distance-query.dto';
 import { Response } from 'express';
+import axios from 'axios';
 
 @Controller('maps')
 export class MapsController {
   @Get('distance')
-  async getDistance(
-    @Query('origins') origins: string,
-    @Query('destinations') destinations: string,
-    @Res() res: Response,
-  ) {
+  async getDistance(@Query() query: DistanceQueryDto, @Res() res: Response) {
     const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+    const { origins, destinations } = query;
     const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origins}&destinations=${destinations}&key=${apiKey}`;
 
     try {
       const response = await axios.get(url);
-      res.status(response.status).send(response.data);
+      res.status(response.status).json(response.data);
     } catch (error) {
       console.error('Error fetching distance from Google Maps API:', error);
       res

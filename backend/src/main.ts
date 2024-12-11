@@ -1,7 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import helmet from 'helmet';
 import * as cookieParser from 'cookie-parser';
 import * as dotenv from 'dotenv';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   // load env vars
@@ -9,8 +11,18 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
 
+  // ensure all endpoints are protected from receiving incorrect data
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+    }),
+  );
+
   // use cookie-parser middleware
   app.use(cookieParser());
+
+  // helmet sets security-related HTTP headers
+  app.use(helmet());
 
   // Enable CORS for the frontend
   app.enableCors({
