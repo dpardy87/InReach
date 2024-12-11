@@ -16,9 +16,24 @@ export class MapsController {
       res.status(response.status).json(response.data);
     } catch (error) {
       console.error('Error fetching distance from Google Maps API:', error);
-      res
-        .status(error.response?.status || 500)
-        .send(error.response?.data || 'Internal Server Error');
+
+      const statusCode = error.response?.status || 500;
+
+      // create sanitized error message
+      const clientErrorMessage =
+        statusCode === 500
+          ? 'An internal server error occurred. Please try again later.'
+          : 'Error fetching distance. Please check your inputs and try again.';
+
+      // log full details
+      console.error('Full Error Details:', {
+        message: error.message,
+        stack: error.stack,
+        response: error.response?.data,
+      });
+
+      // send to client
+      res.status(statusCode).json({ message: clientErrorMessage });
     }
   }
 
@@ -31,12 +46,27 @@ export class MapsController {
 
     try {
       const response = await axios.get(url);
-      res.status(response.status).send(response.data); // Forward the API response to the client
+      res.status(response.status).json(response.data); // Forward the API response to the client
     } catch (error) {
       console.error('Error fetching geocode data:', error);
-      res
-        .status(error.response?.status || 500)
-        .send(error.response?.data || 'Internal Server Error');
+
+      const statusCode = error.response?.status || 500;
+
+      // create sanitized error message
+      const clientErrorMessage =
+        statusCode === 500
+          ? 'An internal server error occurred while fetching geocode data. Please try again later.'
+          : 'Error fetching geocode data. Please check your inputs and try again.';
+
+      // log full details
+      console.error('Full Error Details:', {
+        message: error.message,
+        stack: error.stack,
+        response: error.response?.data,
+      });
+
+      // send to client
+      res.status(statusCode).json({ message: clientErrorMessage });
     }
   }
 
@@ -49,12 +79,27 @@ export class MapsController {
 
     try {
       const response = await axios.get(url);
-      res.status(response.status).send(response.data);
+      res.status(response.status).json(response.data);
     } catch (error) {
       console.error('Error fetching autocomplete data:', error);
-      res
-        .status(error.response?.status || 500)
-        .send(error.response?.data || 'Internal Server Error');
+
+      const statusCode = error.response?.status || 500;
+
+      // create sanitized error message
+      const clientErrorMessage =
+        statusCode === 500
+          ? 'An internal server error occurred while fetching autocomplete data. Please try again later.'
+          : 'Error fetching autocomplete data. Please check your inputs and try again.';
+
+      // log full details
+      console.error('Full Error Details:', {
+        message: error.message,
+        stack: error.stack,
+        response: error.response?.data,
+      });
+
+      // send to client
+      res.status(statusCode).json({ message: clientErrorMessage });
     }
   }
 }
