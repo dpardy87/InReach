@@ -1,6 +1,7 @@
+CREATE DATABASE IF NOT EXISTS `InReach`;
 USE `InReach`;
 
-CREATE TABLE locations (
+CREATE TABLE IF NOT EXISTS `locations` (
     id INT AUTO_INCREMENT PRIMARY KEY,
     locationName VARCHAR(255) NOT NULL,
     address VARCHAR(255) NOT NULL,
@@ -8,7 +9,7 @@ CREATE TABLE locations (
     longitude DECIMAL(11, 8) NOT NULL
 );
 
-CREATE TABLE checkins (
+CREATE TABLE IF NOT EXISTS `checkins` (
     id INT AUTO_INCREMENT PRIMARY KEY,
     userId INT NOT NULL,
     locationId INT NOT NULL,
@@ -18,7 +19,7 @@ CREATE TABLE checkins (
     FOREIGN KEY (locationId) REFERENCES locations(id)
 );
 
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS `users` (
     id INT AUTO_INCREMENT PRIMARY KEY,
     googleId VARCHAR(255) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,

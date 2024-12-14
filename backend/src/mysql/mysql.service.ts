@@ -7,10 +7,10 @@ export class MySQLService implements OnModuleInit, OnModuleDestroy {
 
   async onModuleInit() {
     this.connection = await mysql.createConnection({
-      host: 'mysql', // based on docker-compose.yml
-      user: 'user',
-      password: 'password',
-      database: 'InReach',
+      host: process.env.MYSQL_HOST || 'mysql',
+      user: process.env.MYSQL_USER,
+      password: process.env.MYSQL_PASSWORD,
+      database: process.env.MYSQL_DATABASE,
     });
     console.log('MySQL connection established.');
   }
