@@ -1,6 +1,7 @@
 <template>
   <div class="p-fluid p-grid form-container">
     <h2 class="p-col-12">Check In</h2>
+
     <!-- Location Name Input -->
     <div class="p-field p-col-12 p-md-6">
       <label for="locationName" class="form-label">Location Name</label>
@@ -10,7 +11,11 @@
         class="form-input"
         placeholder="Enter location name"
       />
+      <div v-if="errorMessages.locationName" class="error-message">
+        {{ errorMessages.locationName }}
+      </div>
     </div>
+
     <!-- Address Input -->
     <div class="p-field p-col-12 p-md-6">
       <label for="address" class="form-label">Address</label>
@@ -33,7 +38,11 @@
           </li>
         </ul>
       </div>
+      <div v-if="errorMessages.address" class="error-message">
+        {{ errorMessages.address }}
+      </div>
     </div>
+
     <!-- Notes Input -->
     <div class="p-field p-col-12">
       <label for="notes" class="form-label">Notes</label>
@@ -45,6 +54,7 @@
         placeholder="Add notes (optional)"
       />
     </div>
+
     <!-- Submit Button -->
     <div class="p-col-12 button-container">
       <Button
@@ -84,6 +94,7 @@ export default {
     const distance = ref(null);
     const notes = ref("");
     const message = ref("");
+    const errorMessages = ref({});
     const suggestions = ref([]);
     const isLoading = ref(false);
 
@@ -169,11 +180,22 @@ export default {
     const submitCheckIn = async () => {
       try {
         isLoading.value = true;
-        // Validate address first and store the result
-        const addressValidation = await validateAddress(address.value);
+        errorMessages.value = {}; // Clear previous error messages
 
+        // Validate locationName
+        if (!locationName.value || locationName.value.trim() === "") {
+          errorMessages.value.locationName = "Location name is required.";
+        }
+
+        // Validate address
+        const addressValidation = await validateAddress(address.value);
         if (!addressValidation.valid) {
-          alert("Invalid address. Please enter a valid address.");
+          errorMessages.value.address =
+            "Invalid address. Please enter a valid address.";
+        }
+
+        // If there are errors, stop submission
+        if (Object.keys(errorMessages.value).length > 0) {
           return;
         }
 
@@ -213,6 +235,7 @@ export default {
       address,
       notes,
       message,
+      errorMessages,
       distance,
       isLoading,
       suggestions,
@@ -238,6 +261,22 @@ h2 {
 
 .p-field {
   margin-bottom: 1.5rem;
+}
+
+.error-message {
+  color: #d32f2f;
+  font-size: 0.9rem;
+  margin-top: 5px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-message {
+  margin-top: 15px;
+  font-size: 1rem;
+  color: #2e7d32;
 }
 
 .form-label {
