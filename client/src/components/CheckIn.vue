@@ -1,7 +1,7 @@
 <template>
   <div class="p-d-flex p-flex-column p-ai-center auth-container">
     <h1 class="welcome-title">Welcome to the Check-In App</h1>
-    <Panel header="Getting Started" toggleable class="info-panel">
+    <Panel class="info-panel">
       <p class="intro-text">
         Thank you for using the Check-In App! This app is designed to help you
         seamlessly manage and track your recovery check-ins. Here's how to get
@@ -113,7 +113,7 @@ export default {
   background: #fff;
   border: 1px solid #ddd;
   border-radius: 8px;
-  padding: 15px;
+  padding: 0 15px 15px;
 }
 
 .intro-text {
