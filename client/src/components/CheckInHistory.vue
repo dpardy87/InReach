@@ -1,13 +1,25 @@
 <template>
   <div>
-    <h2>Check-In History</h2>
+    <div class="datatable-header">
+      <Button
+        icon="pi pi-external-link"
+        label="Export"
+        class="p-button-sm p-button-outlined"
+        @click="exportCSV"
+      />
+    </div>
     <DataTable
       :value="checkIns"
-      class="p-datatable-gridlines"
+      class=""
       :scrollable="true"
+      size="small"
       scrollHeight="400px"
     >
-      <Column field="locationName" header="Location Name" />
+      <Column
+        field="locationName"
+        exportHeader="Location"
+        header="Location Name"
+      />
       <Column field="address" header="Address" />
       <Column field="checkInTime" header="Check-In Time">
         <template #body="{ data }">
@@ -15,12 +27,7 @@
         </template>
       </Column>
       <Column field="notes" header="Notes" />
-      <Column field="distance" header="Distance (miles)" />
-      <Column field="userFirstName" header="User">
-        <template #body="slotProps">
-          {{ slotProps.data.userEmail }}
-        </template>
-      </Column>
+      <Column field="distance" header="Distance (Miles)" />
     </DataTable>
     <p v-if="!checkIns.length" class="p-mt-4">No check-ins found.</p>
   </div>
@@ -31,11 +38,13 @@ import axios from "axios";
 import { ref, onMounted } from "vue";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
+import Button from "primevue/button";
 
 export default {
   components: {
     DataTable,
     Column,
+    Button,
   },
   setup() {
     const checkIns = ref([]);
@@ -52,6 +61,36 @@ export default {
       } catch (error) {
         console.error("Error fetching check-ins:", error);
       }
+    };
+
+    const exportCSV = () => {
+      const csvHeader =
+        "Location,Check-in Time,Distance from Location (Miles),Notes\n";
+      const csvRows = checkIns.value.map((record) =>
+        formatCSVRecord(record, formatDate)
+      );
+      const csvContent = csvHeader + csvRows.join("\n");
+
+      // create Blob with CSV content
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+
+      // create hidden download link
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.setAttribute("download", "checkin_history.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+
+    const formatCSVRecord = (record, formatDate) => {
+      // needed since formatDate splits using commas
+      return [
+        `"${record.locationName}"`,
+        `"${formatDate(record.checkInTime)}"`,
+        `"${record.distance}"`,
+        `"${record.notes}"`,
+      ].join(",");
     };
 
     const formatDate = (dateString) => {
@@ -80,9 +119,23 @@ export default {
     onMounted(fetchCheckIns);
 
     return {
+      exportCSV,
       checkIns,
       formatDate,
     };
   },
 };
 </script>
+
+<style scoped>
+.datatable-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.p-button-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+</style>
